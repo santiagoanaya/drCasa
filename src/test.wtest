@@ -1,0 +1,89 @@
+import drCasa.*
+test "Hacer que Frank contraiga malaria"{
+	var malaria = new EnfermedadInfecciosa(800)
+	var frank = new Persona(36, 35000000)
+	frank.contraerEnfermedad(malaria)
+	assert.that(frank.enfermedades().contains(malaria))
+}
+test "Hacer que una malaria (la que contrajo Logan) se reproduzca"{
+	var logan = new Persona(3000000, 36)
+	var malaria = new EnfermedadInfecciosa(500)
+	logan.contraerEnfermedad(malaria)
+	malaria.reproducite()
+	assert.equals(1000,malaria.cantidadCelulasAmenazadas())
+}
+test "Hacer que pase 1 dia y verificar luego de un dia la cantidad de células afectadas de Logan que estén afectadas por enfermedades agresivas."{
+	var logan = new Persona(3000000, 36)
+	var malaria = new EnfermedadInfecciosa(500)
+	var otitis = new EnfermedadInfecciosa(100)
+	var lupus = new EnfermedadAutoinmune(10000)
+	logan.contraerEnfermedad(malaria)
+	logan.contraerEnfermedad(otitis)
+	logan.contraerEnfermedad(lupus)
+	logan.pasarUnDia()
+	//logan.enfermedadesAgresivas() //(la filtracion no me devolvia una lista asi que hice combinado filtrar y sumar celulas)
+	logan.serAfectado(logan)
+	assert.equals(0,logan.enfermedadesAgresivasYCantidadDeCelulasAmenazadas())
+}
+test "Hacer que pase 1 dia y verificar la enfermedad de Logan que más células afecte"{
+	var logan = new Persona(3000000, 36)
+	var malaria = new EnfermedadInfecciosa(500)
+	var otitis = new EnfermedadInfecciosa(100)
+	var lupus = new EnfermedadAutoinmune(10000)
+	logan.contraerEnfermedad(malaria)
+	logan.contraerEnfermedad(otitis)
+	logan.contraerEnfermedad(lupus)
+	logan.pasarUnDia()
+	logan.serAfectado(logan)
+	assert.equals(lupus, logan.enfermedadQueMasAfecta())
+}
+test "Hacer que pase 1 dia y verificar si Logan está en coma, lo que sucede si su temperatura es 45° o si tiene menos de 1.000.000 de células"{
+	var logan = new Persona(3000000, 36)
+	var malaria = new EnfermedadInfecciosa(500)
+	var otitis = new EnfermedadInfecciosa(100)
+	var lupus = new EnfermedadAutoinmune(10000)
+	logan.contraerEnfermedad(malaria)
+	logan.contraerEnfermedad(otitis)
+	logan.contraerEnfermedad(lupus)
+	logan.pasarUnDia()
+	logan.serAfectado(logan)
+	assert.equals(false, logan.estaEnComa())
+}
+test "Hacer que pase 31 dias y verificar la cantidad de células afectadas de Logan que estén afectadas por enfermedades agresivas"{
+	var logan = new Persona(3000000, 36)
+	var malaria = new EnfermedadInfecciosa(500)
+	var otitis = new EnfermedadInfecciosa(100)
+	var lupus = new EnfermedadAutoinmune(10000)
+	logan.contraerEnfermedad(malaria)
+	logan.contraerEnfermedad(otitis)
+	logan.contraerEnfermedad(lupus)
+	31.times({logan.pasarUnDia()})
+	//logan.enfermedadesAgresivas() (la filtracion no me devolvia una lista asi que hice combinado filtrar y sumar celulas)
+	31.times({logan.serAfectado(logan)})
+	assert.equals(10000,logan.enfermedadesAgresivasYCantidadDeCelulasAmenazadas())
+}
+test "Hacer que pase 31 dias y verificar la enfermedad de Logan que más células afecte"{
+	var logan = new Persona(3000000, 36)
+	var malaria = new EnfermedadInfecciosa(500)
+	var otitis = new EnfermedadInfecciosa(100)
+	var lupus = new EnfermedadAutoinmune(10000)
+	logan.contraerEnfermedad(malaria)
+	logan.contraerEnfermedad(otitis)
+	logan.contraerEnfermedad(lupus)
+	31.times({logan.pasarUnDia()})
+	31.times({logan.serAfectado(logan)})
+	assert.equals(lupus, logan.enfermedadQueMasAfecta())
+}
+test "Hacer que pase 31 dias y verificar si Logan está en coma, lo que sucede si su temperatura es 45° o si tiene menos de 1.000.000 de células"{
+	var logan = new Persona(3000000, 36)
+	var malaria = new EnfermedadInfecciosa(500)
+	var otitis = new EnfermedadInfecciosa(100)
+	var lupus = new EnfermedadAutoinmune(10000)
+	logan.contraerEnfermedad(malaria)
+	logan.contraerEnfermedad(otitis)
+	logan.contraerEnfermedad(lupus)
+	31.times({logan.pasarUnDia()})
+	31.times({logan.serAfectado(logan)})
+	assert.equals(45, logan.temperatura())
+	assert.equals(true, logan.estaEnComa())
+}
