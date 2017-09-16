@@ -87,3 +87,46 @@ test "Hacer que pase 31 dias y verificar si Logan está en coma, lo que sucede si
 	assert.equals(45, logan.temperatura())
 	assert.equals(true, logan.estaEnComa())
 }
+test "Hacer que la malaria se atenue en 100 celulas y el lupus en 500 celulas"{
+	var malaria = new EnfermedadInfecciosa(500)
+	var lupus = new EnfermedadAutoinmune(10000)
+	malaria.atenuarse(100)
+	lupus.atenuarse(500)
+	assert.equals(400,malaria.cantidadCelulasAmenazadas())
+	assert.equals(9500,lupus.cantidadCelulasAmenazadas())
+}
+test "Hacer que Cameron atienda a Logan"{
+	var logan = new Persona(3000000, 36)
+	var malaria = new EnfermedadInfecciosa(500)
+	var otitis = new EnfermedadInfecciosa(100)
+	var lupus = new EnfermedadAutoinmune(10000)
+	var cameron = new Medico(1,1,1)
+	logan.contraerEnfermedad(malaria)
+	logan.contraerEnfermedad(otitis)
+	logan.contraerEnfermedad(lupus)
+	cameron.atender(logan)
+	assert.equals(485, malaria.cantidadCelulasAmenazadas())
+	assert.equals(85,otitis.cantidadCelulasAmenazadas())
+	assert.equals(9985,lupus.cantidadCelulasAmenazadas())
+}
+test "Hacer que House atienda a Cameron"{
+	var cameron = new Medico (1,1,1)
+	var house = new JefeDeDepartamento (1,1,[cameron])
+	house.atender(cameron)
+}
+test "Hacer que Cameron contraiga malaria. Hacer que House contraiga malaria"{
+	var cameron = new Medico (1,1,1)
+	var house = new JefeDeDepartamento (1,1,[cameron])
+	var malaria = new EnfermedadInfecciosa(500)
+	house.contraerEnfermedad(malaria)
+	cameron.contraerEnfermedad(malaria)
+	assert.equals([malaria],house.enfermedades())
+	assert.equals([malaria],cameron.enfermedades())
+}
+test "Hacer que House contraiga la muerte"{
+	var cameron = new Medico (1,1,1)
+	var house = new JefeDeDepartamento (1,1,[cameron])
+	house.contraerEnfermedad(laMuerte)
+	house.serAfectado(house)
+	assert.equals(0, house.temperatura())
+}

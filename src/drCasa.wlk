@@ -45,20 +45,21 @@ class Persona{
 	method enfermedadQueMasAfecta(){
 		return self.enfermedades().max({enfermedad => enfermedad.cantidadCelulasAmenazadas()})
 	}
+	method estaEnfermo(){
+		return enfermedades != null
+	}
 	method estaEnComa(){
-	return temperatura == 45 or cantidadDeCelulas < 1000000
+		return temperatura == 45 or cantidadDeCelulas < 1000000
+	}
+	method curarEnfermedades(){
+		self.setearEnfermedades(self.enfermedades().filter({enfermedad => enfermedad.noTieneCelulasAmenazadas()}))
+	}
+	method setearEnfermedades(nuevasEnfermedades){
+		enfermedades = nuevasEnfermedades
 	}
 }
 
-class EnfermedadInfecciosa{
-	var cantidadCelulasAmenazadas
-	var dias = 0
-	constructor (celulasAmenazadas){
-		cantidadCelulasAmenazadas = celulasAmenazadas
-	}
-	method cantidadCelulasAmenazadas() {
-		return cantidadCelulasAmenazadas
-	}
+class EnfermedadInfecciosa inherits Enfermedad{
 	method reproducite(){
 		cantidadCelulasAmenazadas = cantidadCelulasAmenazadas * 2
 	}
@@ -70,33 +71,78 @@ class EnfermedadInfecciosa{
 		unaPersona.aumentarTemperatura(cantidadCelulasAmenazadas/1000)
 		else unaPersona.asignarTemperatura(45)	
 	}
-	method pasarUnDia(){
-		dias += 1
-	}
-	method dias(){
-		return dias
-	}
 }
-class EnfermedadAutoinmune{
+class EnfermedadAutoinmune inherits Enfermedad{
+	method afectarPersona(unaPersona) {
+		unaPersona.cantidadDeCelulas(unaPersona.cantidadDeCelulas() - cantidadCelulasAmenazadas)
+	//estaria copado un repeat dias * accion	
+	}
+	method agresiva(unaPersona) {
+		 return dias >= 30
+		}//afecto a la persona por mas de un mes, osea mas de 30 veces	
+}
+class Enfermedad{
 	var cantidadCelulasAmenazadas
 	var dias = 0
-	constructor (celulasAmenazadas){
+	constructor(celulasAmenazadas){
 		cantidadCelulasAmenazadas = celulasAmenazadas
-	}
+	} 
 	method cantidadCelulasAmenazadas() {
 		return cantidadCelulasAmenazadas
 	}
 	method dias(){
 		return dias
 	}
-	method afectarPersona(unaPersona) {
-		unaPersona.cantidadDeCelulas(unaPersona.cantidadDeCelulas() - cantidadCelulasAmenazadas)
-	//estaria copado un repeat dias * accion	
-	}
 	method pasarUnDia(){
 		dias += 1
 	}
-	method agresiva(unaPersona) {
-		 return dias >= 30
-		}//afecto a la persona por mas de un mes, osea mas de 30 veces	
+	method atenuarse(cantidad){
+		cantidadCelulasAmenazadas -=cantidad
+	}
+	method noTieneCelulasAmenazadas(){
+		return cantidadCelulasAmenazadas <= 0
+	}
+}
+// temporada 2
+
+class Medico inherits Persona{
+	var medicamento
+	constructor (celulas, temp, cantidadMedicamento) = super (celulas, temp) {
+		medicamento = cantidadMedicamento
+		}
+	method medicamento(){
+		return medicamento
+	}
+	method medicamento(cantidad){
+		medicamento = cantidad
+	}
+	method atender(persona){
+		if(persona.estaEnfermo())
+			self.darMedicamento(persona)
+	}
+	method darMedicamento(persona){
+		persona.enfermedades().forEach({enfermedad => enfermedad.atenuarse(medicamento*15)})
+		persona.curarEnfermedades()
+	}
+}
+class JefeDeDepartamento inherits Persona{
+	var subordinados = []
+	constructor (celulas, temp, listaSubordinados) = super (celulas, temp) {
+		subordinados = listaSubordinados
+		}
+	method subordinados(){
+		return subordinados
+	}	
+	method atender(persona){
+		self.subordinados().first().atender(persona)
+	}
+}
+object laMuerte{
+	method afectarPersona(persona){
+		persona.asignarTemperatura(0)
+	}
+	method agresiva(persona){
+		return true
+	}
+	// falta: no se atenua con ningun medicamento, no falta ninguna celula
 }
